@@ -108,6 +108,9 @@ class GameServer:
                         logger.info("Viewer connected")
                         self.viewers.add(websocket)
 
+                    game_info = self.game.info()
+                    await websocket.send(json.dumps(game_info))
+
                 if (
                     data["cmd"] == "key"
                     and self.current_player
@@ -196,7 +199,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--grading-server",
         help="url of grading server",
-        default="http://atnog-tetriscores.av.it.pt/game",
+        default=None,  # "http://atnog-tetriscores.av.it.pt/game",
     )
     args = parser.parse_args()
 
