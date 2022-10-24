@@ -13,7 +13,7 @@ program_icon = pygame.image.load("data/icon2.png")
 pygame.display.set_icon(program_icon)
 
 
-async def agent_loop(server_address="localhost:8085", agent_name="student"):
+async def agent_loop(server_address="localhost:8085", agent_name="mr_Robot"):
     """Example client loop."""
     async with websockets.connect(f"ws://{server_address}/player") as websocket:
 
