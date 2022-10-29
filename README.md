@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-# ia-rush
-=======
 # ia-tetris
->>>>>>> Initial commit
 Projecto de Inteligência Artificial 2022 - Rush Hour
 
 ## How to install
@@ -36,8 +32,7 @@ Make sure pygame is properly installed:
 python -m pygame.examples.aliens
 
 # Tested on:
-<<<<<<< HEAD
 - OSX Monterey 12.5.1
-=======
-- OSX Monterey 12.5.1
->>>>>>> Initial commit
+
+
+
