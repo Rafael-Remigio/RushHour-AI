@@ -60,35 +60,34 @@ async def agent_loop(server_address="localhost:8085", agent_name="mr_Robot"):
                 print("Server has cleanly disconnected us")
                 return
 
-def search(startState):
+def breathsearch(startState):
     open_nodes = [startState]
     visitedNodes = set()
     while open_nodes != []:
-            node = open_nodes.pop(0)
-            mapa = Map(node)
-            if mapa.test_win():
-                solution = node
-                print(mapa.grid)
-                return solution
-            for a in possibleMoves(mapa):
-                print(a)
-                if not visitedNodes.__contains__(a):
-                    open_nodes.append(a)
-            visitedNodes.add(node)
-            print("sdasdasdasds")
-
+        node = open_nodes.pop(0)
+        mapa = Map(node)
+        if mapa.test_win():
+            solution = node
+            print(mapa.grid)
+            return solution
+        for a in possibleMoves(mapa):
+            if not visitedNodes.__contains__(a):
+                open_nodes.append(a)
+                visitedNodes.add(a)
+        print(len(visitedNodes),len(open_nodes))
 
     return None
 
 
 def possibleMoves(m):
     possibleStates = []
-    print(m.pieces)
-    for i in range(m.pieces):
-        car = chr(65+i)
+    for car in m.piecesSet:
+
+        #NEED TO CREATE DEEPCOPY BECAUSE PYTHON IS A BAD LANGUAGE
+
         map2 = copy.deepcopy(m)
         map3 = copy.deepcopy(m)
-        print(m.piece_coordinates(car))
+        
         if m.piece_coordinates(car)[0].y == m.piece_coordinates(car)[1].y:
             try:
                 map2.move(car,Coordinates(x=-1,y=0))
@@ -120,8 +119,9 @@ def possibleMoves(m):
 
     return possibleStates
 
-m = Map("02 ooooooooBoooAABooooooooooooooooooooo 21")
+m = Map("06 oBBCCoooFGHoAAFGHooooGooxoEEoooooooo 940")
 print(m.pieces)
+print(m.piecesSet)
 for i in m.grid:
     print(i)
 #print(m.coordinates)
@@ -134,7 +134,7 @@ for i in m.grid:
 print(possibleMoves(m))
 
 print()
-print(search("03 ooBoooooBooCAABooCoooooooooooooooooo 62"))
+print(breathsearch("07 oEoBBBoEoFGHAAoFGHooCCGIoooooIoooDDI 4543"))
 
 # DO NOT CHANGE THE LINES BELLOW
 # You can change the default values using the command line, example:

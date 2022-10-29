@@ -31,9 +31,11 @@ class Map:
         self.movements = int(movements)
         self.grid_size = int(math.sqrt(len(grid)))
         self.grid = []
-
+        self.piecesSet = set()
         line = []
         for i, pos in enumerate(grid):
+            if pos not in {"o","x"}:
+                self.piecesSet.add(pos)
             line.append(pos)
             if (i + 1) % self.grid_size == 0:
                 self.grid.append(line)
