@@ -68,6 +68,13 @@ class Map:
             return self.grid[int(cursor.y)][int(cursor.x)]
         raise MapException("Out of the grid")
 
+    def getBolean(self, cursor: Coordinates):
+        """Return piece at cursor position."""
+        if 0 <= cursor.x < self.grid_size and 0 <= cursor.y < self.grid_size:
+            return self.grid[int(cursor.y)][int(cursor.x)]
+        return False
+    
+
     def piece_coordinates(self, piece: str):
         """List coordinates holding a piece."""
         return [Coordinates(x, y) for (x, y, p) in self.coordinates if p == piece]
@@ -99,6 +106,50 @@ class Map:
         for pos in piece_coord:
             new_pos = sum(pos, direction)
             self.grid[new_pos.y][new_pos.x] = piece
+
+    def canMove(self, piece: str, direction: Coordinates):
+
+        """Move piece in direction fiven by a vector."""
+        if piece == self.wall_tile:
+            return False
+
+        piece_coord = self.piece_coordinates(piece)
+
+        # Don't move vertical pieces sideways
+        if direction.x != 0 and any([line.count(piece) == 1 for line in self.grid]):
+            return False
+        # Don't move horizontal pieces up-down
+        if direction.y != 0 and any([line.count(piece) > 1 for line in self.grid]):
+            return False
+
+        def sum(a: Coordinates, b: Coordinates):
+            return Coordinates(a.x + b.x, a.y + b.y)
+
+        for pos in piece_coord:
+            if self.getBolean(sum(pos, direction)) == False:
+                return False
+            if not self.getBolean(sum(pos, direction)) in [piece, self.empty_tile]:
+                return False
+
+        return True
+
+    def moveWithNoTests(self, piece: str, direction: Coordinates):
+        """Move piece in direction fiven by a vector. Without the tests"""
+       
+
+        piece_coord = self.piece_coordinates(piece)
+
+        def sum(a: Coordinates, b: Coordinates):
+            return Coordinates(a.x + b.x, a.y + b.y)
+
+        for pos in piece_coord:
+            self.grid[pos.y][pos.x] = self.empty_tile
+
+        for pos in piece_coord:
+            new_pos = sum(pos, direction)
+            self.grid[new_pos.y][new_pos.x] = piece
+
+
 
     def test_win(self):
         """Test if player_car has crossed the left most column."""
