@@ -27,6 +27,7 @@ async def agent_loop(server_address="localhost:8085", agent_name="mr_Robot"):
         level = 0
         moves = ''
         mapa = None
+        crazyMode = False
         while True:
             try:
                 state = json.loads(
@@ -37,19 +38,42 @@ async def agent_loop(server_address="localhost:8085", agent_name="mr_Robot"):
                     moves = ''
                     currentlySearching = False
                     mapa = Map(state.get("grid"))
+                    mapaString = state.get("grid").split(" ")[1]
+                    print(mapaString)
 
                 if not currentlySearching:
                     currentlySearching = True
-                    moves = (breathsearch(state.get("grid")))
+                    moves = await (breathsearch(state.get("grid")))
                     print(moves)
+                
+                if mapaString != state.get("grid").split(" ")[1]:
+                    print("CrazyDriver", state.get("grid").split(" ")[1])
+                    crazyMode = True
+
+                    crazyMoves = calculateCrazyMoves(mapaString,state.get("grid").split(" ")[1],mapa)
+                    mapa = Map(state.get("grid"))
+
+                if crazyMode:
+                    if crazyMoves == "":
+                        crazyMode = False
+                        continue
+                
+                    mapaString, crazyMoves, key = getNextMove(crazyMoves,state.get("cursor"),mapa,state.get("selected"),mapaString)
+                    await websocket.send(json.dumps({"cmd": "key", "key": key})) 
+
+
+                    continue
 
 
                 if moves == "":
                     continue
                 
-                
-                # Next lines are only for the Human Agent, the key values are nonetheless the correct ones!
-                moves, key = getNextMove(moves,state.get("cursor"),mapa,state.get("selected"))
+
+
+                    
+                    
+                # do the move
+                mapaString, moves, key = getNextMove(moves,state.get("cursor"),mapa,state.get("selected"),mapaString)
 
                 await websocket.send(json.dumps({"cmd": "key", "key": key})) 
 
@@ -57,7 +81,39 @@ async def agent_loop(server_address="localhost:8085", agent_name="mr_Robot"):
                 print("Server has cleanly disconnected us")
                 return
 
-def getNextMove(moves,cursor,mapa,selected):
+
+def calculateCrazyMoves(oldMap,newMap,m):
+
+    grid_str = oldMap
+    crazy_car = None
+    positive = 0
+    for i in range(len(oldMap)):
+        old_char = grid_str[i]
+        new_char = newMap[i]
+        # Gets the odd character
+        if new_char != old_char:
+            crazy_car = old_char if old_char != 'o' else new_char
+            positive = -1 if old_char != 'o' else 1
+
+    print(crazy_car,positive)    
+
+    if m.piece_coordinates(crazy_car)[0].y == m.piece_coordinates(crazy_car)[1].y:
+        print("horizontal")
+        if positive == -1:
+            return crazy_car+"d"
+        else:
+            return crazy_car+"a"
+
+    else:
+        print("vertical")
+
+        if positive == -1:
+            return crazy_car+"s"
+        else:
+            return crazy_car+"w"
+
+
+def getNextMove(moves,cursor,mapa,selected,mapaString):
     
     cursorPos = Coordinates(cursor[0],cursor[1])
     #If a car is selected
@@ -65,25 +121,37 @@ def getNextMove(moves,cursor,mapa,selected):
 
         # if it is the correct car
         if selected == moves[0]:
-            
-            mapa.moveWithNoTests(moves[0],letterToCoords(moves[1])) #moves car in the map Object
+
 
             key = moves[1] #selects the move
+
+            mapa.moveWithNoTests(moves[0],letterToCoords(moves[1])) #moves car in the map Object
+
             moves =  moves[2:]  #removes the move from the grid
-            return moves,key 
+            
+
+            # To make this a bit faster in checking the Crazy Drivers
+            # This will only change the MapaString variable
+            # using the Map.__repr_ method takes O(n)
+            # maybe there is a better solution, Problem for future me
+
+            mapaString = mapa.__repr__().split(" ")[1]
+
+
+            return mapaString, moves,key 
 
         #if it is the wrong car
         else:
-            return moves, " "
+            return mapaString, moves, " "
 
     # If we are on top of the correct car
     if cursorPos in mapa.piece_coordinates(moves[0]):
 
-        return moves, " " #selects that car
+        return mapaString, moves, " " #selects that car
     
     # if not on top of the car we need to move to the top of the car
     else:   
-        return moves, moveCursorToCar(mapa.piece_coordinates(moves[0])[0],cursor)
+        return mapaString, moves, moveCursorToCar(mapa.piece_coordinates(moves[0])[0],cursor)
 
 
 
@@ -116,7 +184,7 @@ def moveCursorToCar(carCordinates,cursor):
         return "w"
     
 
-def breathsearch(startState):
+async def breathsearch(startState):
     open_nodes = [startState]
     visitedNodes = set()
     paths = {startState: ""}
@@ -192,7 +260,6 @@ for i in Lines:
 # DO NOT CHANGE THE LINES BELLOW
 # You can change the default values using the command line, example:
 # $ NAME='arrumador' python3 client.py
-currentlySearching = False
 
 loop = asyncio.get_event_loop()
 SERVER = os.environ.get("SERVER", "localhost")
