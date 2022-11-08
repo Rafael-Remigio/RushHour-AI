@@ -60,7 +60,6 @@ async def agent_loop(server_address="localhost:8085", agent_name="mr_Robot"):
 def getNextMove(moves,cursor,mapa,selected):
     
     cursorPos = Coordinates(cursor[0],cursor[1])
-
     #If a car is selected
     if selected != "":
 
@@ -71,7 +70,6 @@ def getNextMove(moves,cursor,mapa,selected):
 
             key = moves[1] #selects the move
             moves =  moves[2:]  #removes the move from the grid
-
             return moves,key 
 
         #if it is the wrong car
@@ -85,9 +83,6 @@ def getNextMove(moves,cursor,mapa,selected):
     
     # if not on top of the car we need to move to the top of the car
     else:   
-
-        print(moves[0])
-        print(mapa.piece_coordinates(moves[0]))
         return moves, moveCursorToCar(mapa.piece_coordinates(moves[0])[0],cursor)
 
 
@@ -99,13 +94,13 @@ def letterToCoords(letter):
     if letter == "a":
         return Coordinates(-1,0)
     elif letter == "s":
-        return Coordinates(0,-1)
+        return Coordinates(0,1)
 
     elif letter == "d":
         return Coordinates(1,0)
 
     elif letter == "w":
-        return Coordinates(0,1)
+        return Coordinates(0,-1)
     
     return None
 
