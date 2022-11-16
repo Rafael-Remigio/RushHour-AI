@@ -27,12 +27,14 @@ async def agent_loop(server_address="localhost:8085", agent_name="mr_Robot"):
         level = 0
         moves = ''
         mapa = None
+        here = 0
         crazyMode = False
         while True:
             try:
                 state = json.loads(
                     await websocket.recv()
                 )  # receive game update, this must be called timely or your game will get out of sync with the server
+                print(state)
                 if state.get('level') != level:
                     level = state.get('level')
                     moves = ''
@@ -43,7 +45,7 @@ async def agent_loop(server_address="localhost:8085", agent_name="mr_Robot"):
 
                 if not currentlySearching:
                     currentlySearching = True
-                    moves = await (breathsearch(state.get("grid")))
+                    moves =  breathsearch(state.get("grid"))
                     print(moves)
                 
                 if mapaString != state.get("grid").split(" ")[1]:
@@ -54,12 +56,25 @@ async def agent_loop(server_address="localhost:8085", agent_name="mr_Robot"):
                     mapa = Map(state.get("grid"))
 
                 if crazyMode:
+                    here += 1
                     if crazyMoves == "":
                         crazyMode = False
+                        here = 0
                         continue
-                
+                    
+                    if here == 60:
+                        currentlySearching = False
+                        level = 0
+                        moves = ''
+                        crazyMoves = ''
+                        mapa = None
+                        here = 0
+                        crazyMode = False
+                        continue
+
                     mapaString, crazyMoves, key = getNextMove(crazyMoves,state.get("cursor"),mapa,state.get("selected"),mapaString)
                     await websocket.send(json.dumps({"cmd": "key", "key": key})) 
+
 
 
                     continue
@@ -184,7 +199,7 @@ def moveCursorToCar(carCordinates,cursor):
         return "w"
     
 
-async def breathsearch(startState):
+def breathsearch(startState):
     open_nodes = [startState]
     visitedNodes = set()
     paths = {startState: ""}
@@ -265,5 +280,5 @@ loop = asyncio.get_event_loop()
 SERVER = os.environ.get("SERVER", "localhost")
 PORT = os.environ.get("PORT", "8085")
 NAME = os.environ.get("NAME", getpass.getuser())
-loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME)) 
+loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", "remigio")) 
 
