@@ -10,14 +10,14 @@ import os
 from re import search
 import time
 from tracemalloc import start
-from common import Coordinates, Map
+from my_common import Coordinates, Map
 # Next 4 lines are not needed for AI agents, please remove them from your code!
 import pygame
 import websockets
 
 
 
-async def agent_loop(server_address="localhost:8085", agent_name="mr_Robot"):
+async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
     """Example client loop."""
     async with websockets.connect(f"ws://{server_address}/player") as websocket:
 
@@ -278,7 +278,7 @@ for i in Lines:
 
 loop = asyncio.get_event_loop()
 SERVER = os.environ.get("SERVER", "localhost")
-PORT = os.environ.get("PORT", "8085")
+PORT = os.environ.get("PORT", "8080")
 NAME = os.environ.get("NAME", getpass.getuser())
 loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", "remigio")) 
 
