@@ -1,0 +1,3 @@
+checkar o test win antes de adicionar ao set
+usar custo
+testar guardar mapas em vez de strings
