@@ -210,14 +210,13 @@ def breathsearch(startState):
 
         if mapa.test_win():
             solution = node
-            return paths.get(solution)
+            return solution
 
 
         for a in possibleMoves(mapa):
             if not visitedNodes.__contains__(a[0]):
                 open_nodes.append(a[0])
                 visitedNodes.add(a[0])
-                paths[a[0]] = paths.get(node) + a[1]
 
 
         #print(len(visitedNodes),len(open_nodes))
@@ -259,7 +258,7 @@ def possibleMoves(m):
 
     return possibleStates
 
-""" 
+
 file1 = open('levels.txt', 'r')
 Lines = file1.readlines()
 j =1
@@ -270,15 +269,16 @@ for i in Lines:
     endTime = time.time()
     print("lever nº " + str(j) + " time is " + str(endTime - startTime) + " seconds")
     j+=1
- """
-
+ 
 # DO NOT CHANGE THE LINES BELLOW
 # You can change the default values using the command line, example:
 # $ NAME='arrumador' python3 client.py
 
+""" 
 loop = asyncio.get_event_loop()
 SERVER = os.environ.get("SERVER", "localhost")
 PORT = os.environ.get("PORT", "8080")
 NAME = os.environ.get("NAME", getpass.getuser())
 loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME)) 
 
+ """

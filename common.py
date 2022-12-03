@@ -41,7 +41,6 @@ class Map:
                 self.grid.append(line)
                 line = []
 
-
     def __repr__(self):
         """Revert map object to string."""
         raw = ""

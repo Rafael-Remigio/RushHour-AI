@@ -5,6 +5,7 @@ import getpass
 import imp
 from importlib.resources import path
 import json
+import math
 from mimetypes import common_types
 import os
 from re import search
@@ -271,6 +272,41 @@ for i in Lines:
     print("lever nº " + str(j) + " time is " + str(endTime - startTime) + " seconds")
     j+=1
  """
+
+
+
+# Methods
+
+
+def stringToGrid(mapString):
+    mapString = mapString.split(" ")[1]
+    grid_size = int(math.sqrt(len(mapString)))
+    pieceSet = []
+    grid = []
+    for i, pos in enumerate(mapString):
+
+        # Creates an Array with all the diferent Pieces
+        if (pos not in {"o","x"} ) and (pos not in pieceSet):
+            pieceSet.append(pos)
+        
+        #
+        line.append(pos)
+        if (i + 1) % grid_size == 0:
+            grid.append(line)
+            line = []
+
+    return (grid,pieceSet,"")
+
+
+
+
+
+
+
+
+
+
+
 
 # DO NOT CHANGE THE LINES BELLOW
 # You can change the default values using the command line, example:
