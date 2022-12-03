@@ -3,6 +3,8 @@ import math
 
 import copy
 
+import time
+
 # Methods
 
 
@@ -170,6 +172,40 @@ def possibleMoves(map):
 
 
 
+def breathsearch(startState):
+    mapa = stringToGrid(startState)
+    open_nodes = [mapa]
+    visitedNodes = set()
+    while open_nodes != []:
+
+        node = open_nodes.pop(0)
+
+        if test_win(node[0]):
+            solution = node
+            return solution[2]
+
+
+        for a in possibleMoves(node):
+            if not visitedNodes.__contains__(str(a[0])):
+                open_nodes.append(a)
+                visitedNodes.add(str(a[0]))
+
+
+
+    return None
+
+
+
 
 if __name__ == "__main__":
-    pass
+    
+    file1 = open('levels.txt', 'r')
+    Lines = file1.readlines()
+    j =1
+    for i in Lines:
+
+        startTime = time.time()
+        print(breathsearch(i))
+        endTime = time.time()
+        print("lever nº " + str(j) + " time is " + str(endTime - startTime) + " seconds")
+        j+=1

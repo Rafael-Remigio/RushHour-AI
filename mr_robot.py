@@ -12,7 +12,7 @@ from re import search
 import time
 from tracemalloc import start
 from my_common import Coordinates, Map
-# Next 4 lines are not needed for AI agents, please remove them from your code!
+from commonMethods import breathsearch
 import pygame
 import websockets
 
@@ -200,31 +200,6 @@ def moveCursorToCar(carCordinates,cursor):
         return "w"
     
 
-def breathsearch(startState):
-    open_nodes = [startState]
-    visitedNodes = set()
-    paths = {startState: ""}
-    while open_nodes != []:
-        node = open_nodes.pop(0)
-        mapa = Map(node)
-
-
-        if mapa.test_win():
-            solution = node
-            return paths.get(solution)
-
-
-        for a in possibleMoves(mapa):
-            if not visitedNodes.__contains__(a[0]):
-                open_nodes.append(a[0])
-                visitedNodes.add(a[0])
-                paths[a[0]] = paths.get(node) + a[1]
-
-
-        #print(len(visitedNodes),len(open_nodes))
-
-    return None
-
 # This code need to be rebuilt
 def possibleMoves(m):
     possibleStates = []
@@ -272,35 +247,6 @@ for i in Lines:
     print("lever nº " + str(j) + " time is " + str(endTime - startTime) + " seconds")
     j+=1
  """
-
-
-
-# Methods
-
-
-def stringToGrid(mapString):
-    mapString = mapString.split(" ")[1]
-    grid_size = int(math.sqrt(len(mapString)))
-    pieceSet = []
-    grid = []
-    for i, pos in enumerate(mapString):
-
-        # Creates an Array with all the diferent Pieces
-        if (pos not in {"o","x"} ) and (pos not in pieceSet):
-            pieceSet.append(pos)
-        
-        #
-        line.append(pos)
-        if (i + 1) % grid_size == 0:
-            grid.append(line)
-            line = []
-
-    return (grid,pieceSet,"")
-
-
-
-
-
 
 
 
