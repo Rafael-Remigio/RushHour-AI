@@ -35,7 +35,8 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
                 state = json.loads(
                     await websocket.recv()
                 )  # receive game update, this must be called timely or your game will get out of sync with the server
-                print(state)
+                
+
                 if state.get('level') != level:
                     level = state.get('level')
                     moves = ''
@@ -44,6 +45,8 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
                     mapaString = state.get("grid").split(" ")[1]
                     print(mapaString)
 
+
+
                 if not currentlySearching:
                     currentlySearching = True
                     moves =  breathsearch(state.get("grid"))
@@ -51,34 +54,15 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
                 
                 if mapaString != state.get("grid").split(" ")[1]:
                     print("CrazyDriver", state.get("grid").split(" ")[1])
-                    crazyMode = True
-
-                    crazyMoves = calculateCrazyMoves(mapaString,state.get("grid").split(" ")[1],mapa)
+                    newMapa = Map(state.get("grid"))
+                    crazyMoves = calculateCrazyMoves(newMapa,mapa)
                     mapa = Map(state.get("grid"))
 
-                if crazyMode:
-                    here += 1
-                    if crazyMoves == "":
-                        crazyMode = False
-                        here = 0
-                        continue
+                    moves = crazyMoves + moves
+
                     
-                    if here == 60:
-                        currentlySearching = False
-                        level = 0
-                        moves = ''
-                        crazyMoves = ''
-                        mapa = None
-                        here = 0
-                        crazyMode = False
-                        continue
+                    
 
-                    mapaString, crazyMoves, key = getNextMove(crazyMoves,state.get("cursor"),mapa,state.get("selected"),mapaString)
-                    await websocket.send(json.dumps({"cmd": "key", "key": key})) 
-
-
-
-                    continue
 
 
                 if moves == "":
@@ -98,36 +82,65 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
                 return
 
 
-def calculateCrazyMoves(oldMap,newMap,m):
+def calculateCrazyMoves(newMap,oldMapa):
+    crazy_moves = ""
+    grid_str = oldMapa.__repr__().split(" ")[1]
+    new_grid_str = newMap.__repr__().split(" ")[1]
 
-    grid_str = oldMap
-    crazy_car = None
-    positive = 0
-    for i in range(len(oldMap)):
-        old_char = grid_str[i]
-        new_char = newMap[i]
-        # Gets the odd character
-        if new_char != old_char:
-            crazy_car = old_char if old_char != 'o' else new_char
-            positive = -1 if old_char != 'o' else 1
+    for i in oldMapa.grid:
+        print(i)
+    
 
-    print(crazy_car,positive)    
 
-    if m.piece_coordinates(crazy_car)[0].y == m.piece_coordinates(crazy_car)[1].y:
-        print("horizontal")
-        if positive == -1:
-            return crazy_car+"d"
+    while (grid_str != new_grid_str):
+        crazy_car = None
+        positive = 0
+
+
+        for i in range(len(grid_str)):
+            old_char = grid_str[i]
+            new_char = new_grid_str[i]
+            # Gets the odd character
+            if new_char != old_char:
+                crazy_car = old_char if old_char != 'o' else new_char
+                positive = -1 if old_char != 'o' else 1
+                break
+            
+
+        if oldMapa.piece_coordinates(crazy_car)[0].y == oldMapa.piece_coordinates(crazy_car)[1].y:
+            print("horizontal")
+            if positive == -1:
+                crazy_moves = crazy_moves + crazy_car+"a"
+                print(crazy_car,letterToCoords("a"))
+                newMap.move(crazy_car,letterToCoords("a")) #moves car in the map Object
+                
+            else:
+                crazy_moves = crazy_moves + crazy_car+"d"
+                print(crazy_car,letterToCoords("d"))
+                newMap.move(crazy_car,letterToCoords("d")) #moves car in the map Object
+
+
         else:
-            return crazy_car+"a"
+            print("vertical")
 
-    else:
-        print("vertical")
+            if positive == -1:
+                crazy_moves = crazy_moves + crazy_car+"w"
+                crazy_car,letterToCoords("w")
+                newMap.move(crazy_car,letterToCoords("w")) #moves car in the map Object
+            else:
+                crazy_moves = crazy_moves + crazy_car+"s"
+                crazy_car,letterToCoords("s")
+                newMap.move(crazy_car,letterToCoords("s")) #moves car in the map Object
 
-        if positive == -1:
-            return crazy_car+"s"
-        else:
-            return crazy_car+"w"
 
+
+        grid_str = oldMapa.__repr__().split(" ")[1]
+        new_grid_str = newMap.__repr__().split(" ")[1]
+
+
+
+
+    return crazy_moves
 
 def getNextMove(moves,cursor,mapa,selected,mapaString):
     
@@ -260,7 +273,7 @@ for i in Lines:
 
 loop = asyncio.get_event_loop()
 SERVER = os.environ.get("SERVER", "localhost")
-PORT = os.environ.get("PORT", "8080")
+PORT = os.environ.get("PORT", "8000")
 NAME = os.environ.get("NAME", getpass.getuser())
-loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", "remigio")) 
+loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME)) 
 
