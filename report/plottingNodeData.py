@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 file0 = open("levels_copy.txt",'r')
 file1 = open('numberNodesBreath.txt', 'r')
 file2 = open('numberNodesH1.txt', 'r')
+file3 = open('numberNodesH2.txt', 'r')
+
 
 x = []
 
@@ -31,6 +33,13 @@ for line in Lines[1:]:
 
 plt.plot(x, y2,'o',label = "Heuristc H1 -> Distance from car A to exit")
 
+
+Lines = file3.readlines()
+y2 = []
+for line in Lines[1:]:
+    y2.append(float(line.split(" ")[3]))
+
+plt.plot(x, y2,'o',label = "Heuristc H2 -> Distance from car A to exit + number of cars on its way")
 
 # naming the x axis
 plt.xlabel('Number of possible states')

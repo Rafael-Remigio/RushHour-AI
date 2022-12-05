@@ -230,8 +230,26 @@ def DistanceToExitEuristics(grid,_coordinates):
     cords = piece_coordinates("A",_coordinates)[1]
 
 
-
     return grid_size - cords[0]
+
+
+
+def DistanceToExitBlockingCars(grid,_coordinates):
+
+    grid_size = len(grid)
+
+    cords = piece_coordinates("A",_coordinates)[1]
+
+    grid_size - cords[0]
+    array = [(x,cords[1]) for x in range(grid_size - cords[0])]
+    counter = 0
+    for i in _coordinates:
+        if (i[0],i[1]) in array:
+            counter+=1
+        
+
+    return grid_size - cords[0] + counter
+
 
 
 def possibleMovesAStart(map):
@@ -250,7 +268,7 @@ def possibleMovesAStart(map):
                 grid2 = copy.deepcopy(map[0])
                 move(grid2,car,carCords,(-1,0))
 
-                map2 = (grid2,map[1],map[2] + car + "a",DistanceToExitEuristics(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
+                map2 = (grid2,map[1],map[2] + car + "a",DistanceToExitBlockingCars(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
 
 
                 
@@ -264,7 +282,7 @@ def possibleMovesAStart(map):
                 grid2 = copy.deepcopy(map[0])
                 move(grid2,car,carCords,(1,0))
 
-                map2 = (grid2,map[1],map[2] + car + "d",DistanceToExitEuristics(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
+                map2 = (grid2,map[1],map[2] + car + "d",DistanceToExitBlockingCars(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
 
                 
                 possibleStates.append(map2) # Appends it to the possible states
@@ -278,7 +296,7 @@ def possibleMovesAStart(map):
                 move(grid2,car,carCords,(0,-1))
 
 
-                map2 = (grid2,map[1],map[2] + car + "w",DistanceToExitEuristics(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
+                map2 = (grid2,map[1],map[2] + car + "w",DistanceToExitBlockingCars(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
 
                 
                 possibleStates.append(map2) # Appends it to the possible states
@@ -290,7 +308,7 @@ def possibleMovesAStart(map):
                 grid2 = copy.deepcopy(map[0])
                 move(grid2,car,carCords,(0,1))
 
-                map2 = (grid2,map[1],map[2] + car + "s",DistanceToExitEuristics(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
+                map2 = (grid2,map[1],map[2] + car + "s",DistanceToExitBlockingCars(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
 
                 
                 possibleStates.append(map2) # Appends it to the possible states
@@ -361,7 +379,7 @@ if __name__ == "__main__":
     j =1
     startTime = 0
     endTime = 0
-    searchType = "breathSearch"
+    searchType = "A*"
     for i in Lines:
 
         if searchType == "breathSearch":

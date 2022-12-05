@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 file1 = open('times_1.txt', 'r')
 file2 = open('times_2.txt', 'r')
 file3 = open('times_3.txt', 'r')
+file4 = open('times_4.txt', 'r')
+
 Lines = file1.readlines()
 j =1
 x = []
@@ -14,7 +16,7 @@ for line in Lines[3:]:
     y1.append(float(line.split(" ")[5]))
 
 
-plt.plot(x, y1, label = "old code")
+#plt.plot(x, y1, label = "old code")
 
 
 Lines = file2.readlines()
@@ -22,7 +24,7 @@ y2 = []
 for line in Lines[3:]:
     y2.append(float(line.split(" ")[5]))
 
-plt.plot(x, y2, label = "new code")
+#plt.plot(x, y2, label = "new code")
 
 
 
@@ -32,6 +34,19 @@ for line in Lines[3:]:
     y3.append(float(line.split(" ")[5]))
 
 plt.plot(x, y3, label = "new code with heuristics. Distance Car to Exit")
+
+
+
+
+Lines = file4.readlines()
+y3 = []
+for line in Lines[3:]:
+    y3.append(float(line.split(" ")[5]))
+
+plt.plot(x, y3, label = "new code with heuristics. Distance Car to Exit + Cars in its way")
+
+
+
 
 # naming the x axis
 plt.xlabel('Level')
