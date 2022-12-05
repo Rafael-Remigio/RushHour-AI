@@ -31,15 +31,17 @@ y3 = []
 for line in Lines[3:]:
     y3.append(float(line.split(" ")[5]))
 
-plt.plot(x, y3, label = "new code with heuristics")
+plt.plot(x, y3, label = "new code with heuristics. Distance Car to Exit")
 
 # naming the x axis
-plt.xlabel('x - axis')
+plt.xlabel('Level')
 # naming the y axis
-plt.ylabel('y - axis')
+plt.ylabel('Time - seconds')
 # giving a title to my graph
 plt.title('Code Changes Comparing times!')
   
+plt.grid()
+
 # show a legend on the plot
 plt.legend()
   

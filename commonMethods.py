@@ -223,7 +223,7 @@ def possibleMoves(map):
     return possibleStates
 
 
-def customHeuristics(grid,_coordinates):
+def DistanceToExitEuristics(grid,_coordinates):
 
     grid_size = len(grid)
 
@@ -250,7 +250,7 @@ def possibleMovesAStart(map):
                 grid2 = copy.deepcopy(map[0])
                 move(grid2,car,carCords,(-1,0))
 
-                map2 = (grid2,map[1],map[2] + car + "a",customHeuristics(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
+                map2 = (grid2,map[1],map[2] + car + "a",DistanceToExitEuristics(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
 
 
                 
@@ -264,7 +264,7 @@ def possibleMovesAStart(map):
                 grid2 = copy.deepcopy(map[0])
                 move(grid2,car,carCords,(1,0))
 
-                map2 = (grid2,map[1],map[2] + car + "d",customHeuristics(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
+                map2 = (grid2,map[1],map[2] + car + "d",DistanceToExitEuristics(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
 
                 
                 possibleStates.append(map2) # Appends it to the possible states
@@ -278,7 +278,7 @@ def possibleMovesAStart(map):
                 move(grid2,car,carCords,(0,-1))
 
 
-                map2 = (grid2,map[1],map[2] + car + "w",customHeuristics(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
+                map2 = (grid2,map[1],map[2] + car + "w",DistanceToExitEuristics(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
 
                 
                 possibleStates.append(map2) # Appends it to the possible states
@@ -290,7 +290,7 @@ def possibleMovesAStart(map):
                 grid2 = copy.deepcopy(map[0])
                 move(grid2,car,carCords,(0,1))
 
-                map2 = (grid2,map[1],map[2] + car + "s",customHeuristics(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
+                map2 = (grid2,map[1],map[2] + car + "s",DistanceToExitEuristics(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
 
                 
                 possibleStates.append(map2) # Appends it to the possible states
@@ -311,6 +311,7 @@ def breathsearch(startState):
 
         if test_win(node[0]):
             solution = node
+            print("open nodes ->",len(visitedNodes))
             return solution[2]
 
 
@@ -337,6 +338,7 @@ def AStar(startState):
 
         if test_win(node[0]):
             solution = node
+            print("open nodes ->",len(visitedNodes))
             return solution[2]
 
 
@@ -359,12 +361,12 @@ if __name__ == "__main__":
     j =1
     startTime = 0
     endTime = 0
-    searchType = "A*"
+    searchType = "breathSearch"
     for i in Lines:
 
         if searchType == "breathSearch":
             startTime = time.time()
-            print(breathsearch(i))
+            breathsearch(i)
             endTime = time.time()
 
         if searchType == "A*":
@@ -373,5 +375,5 @@ if __name__ == "__main__":
             endTime = time.time()
     
     
-        print("level nº " + str(j) + " time is " + str(endTime - startTime) + " seconds")
+        #print("level nº " + str(j) + " time is " + str(endTime - startTime) + " seconds")
         j+=1
