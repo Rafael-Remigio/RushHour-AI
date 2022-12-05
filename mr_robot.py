@@ -12,7 +12,7 @@ from re import search
 import time
 from tracemalloc import start
 from my_common import Coordinates, Map
-from commonMethods import breathsearch
+from commonMethods import breathsearch, AStar
 import pygame
 import websockets
 
@@ -49,7 +49,7 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
 
                 if not currentlySearching:
                     currentlySearching = True
-                    moves =  breathsearch(state.get("grid"))
+                    moves =  AStar(state.get("grid"))
                     print(moves)
                 
                 if mapaString != state.get("grid").split(" ")[1]:
