@@ -43,17 +43,14 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
                     currentlySearching = False
                     mapa = Map(state.get("grid"))
                     mapaString = state.get("grid").split(" ")[1]
-                    print(mapaString)
 
 
 
                 if not currentlySearching:
                     currentlySearching = True
                     moves =  AStar(state.get("grid"))
-                    print(moves)
                 
                 if mapaString != state.get("grid").split(" ")[1]:
-                    print("CrazyDriver", state.get("grid").split(" ")[1])
                     newMapa = Map(state.get("grid"))
                     crazyMoves = calculateCrazyMoves(newMapa,mapa)
                     mapa = Map(state.get("grid"))
@@ -87,8 +84,6 @@ def calculateCrazyMoves(newMap,oldMapa):
     grid_str = oldMapa.__repr__().split(" ")[1]
     new_grid_str = newMap.__repr__().split(" ")[1]
 
-    for i in oldMapa.grid:
-        print(i)
     
 
 
@@ -121,7 +116,6 @@ def calculateCrazyMoves(newMap,oldMapa):
 
 
         else:
-            print("vertical")
 
             if positive == -1:
                 crazy_moves = crazy_moves + crazy_car+"w"

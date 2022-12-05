@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 
 file1 = open('times_1.txt', 'r')
 file2 = open('times_2.txt', 'r')
+file3 = open('times_3.txt', 'r')
 Lines = file1.readlines()
 j =1
 x = []
@@ -23,6 +24,14 @@ for line in Lines[3:]:
 
 plt.plot(x, y2, label = "new code")
 
+
+
+Lines = file3.readlines()
+y3 = []
+for line in Lines[3:]:
+    y3.append(float(line.split(" ")[5]))
+
+plt.plot(x, y3, label = "new code with heuristics")
 
 # naming the x axis
 plt.xlabel('x - axis')

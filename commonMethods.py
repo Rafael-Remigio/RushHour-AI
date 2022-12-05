@@ -369,7 +369,7 @@ if __name__ == "__main__":
 
         if searchType == "A*":
             startTime = time.time()
-            #print(AStar(i))
+            AStar(i)
             endTime = time.time()
     
     
