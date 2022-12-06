@@ -16,7 +16,7 @@ for line in Lines[3:]:
     y1.append(float(line.split(" ")[5]))
 
 
-plt.plot(x, y1, label = "old code")
+#plt.plot(x, y1, label = "old code")
 
 
 Lines = file2.readlines()
@@ -24,7 +24,7 @@ y2 = []
 for line in Lines[3:]:
     y2.append(float(line.split(" ")[5]))
 
-plt.plot(x, y2, label = "new code")
+#plt.plot(x, y2, label = "new code")
 
 
 
