@@ -52,13 +52,13 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
                 
                 if mapaString != state.get("grid").split(" ")[1]:
                     newMapa = Map(state.get("grid"))
-                    crazyMoves = calculateCrazyMoves(newMapa,mapa)
-                    mapa = Map(state.get("grid"))
-
-                    moves = crazyMoves + moves
-
-                    
-                    
+                    try: # if something goes wrong calculating the crazy cars
+                        crazyMoves = calculateCrazyMoves(newMapa,mapa)
+                        mapa = Map(state.get("grid"))
+                        moves = crazyMoves + moves
+                    except: # recalculates a solution
+                        currentlySearching = True
+                        moves =  AStar(state.get("grid"))
 
 
 
@@ -241,19 +241,7 @@ def possibleMoves(m):
 
 
     return possibleStates
-
-""" 
-file1 = open('levels.txt', 'r')
-Lines = file1.readlines()
-j =1
-for i in Lines:
-
-    startTime = time.time()
-    print(breathsearch(i))
-    endTime = time.time()
-    print("lever nº " + str(j) + " time is " + str(endTime - startTime) + " seconds")
-    j+=1
- """
+  
 
 
 
