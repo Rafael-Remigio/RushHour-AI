@@ -240,8 +240,8 @@ def DistanceToExitBlockingCars(grid,_coordinates):
 
     cords = piece_coordinates("A",_coordinates)[1]
 
-    grid_size - cords[0]
-    array = [(x,cords[1]) for x in range(grid_size - cords[0])]
+
+    array = [(x,cords[1]) for x in range(grid_size-1,cords[0],-1)]
     counter = 0
     for i in _coordinates:
         if (i[0],i[1]) in array:
@@ -268,7 +268,7 @@ def possibleMovesAStart(map):
                 grid2 = copy.deepcopy(map[0])
                 move(grid2,car,carCords,(-1,0))
 
-                map2 = (grid2,map[1],map[2] + car + "a",DistanceToExitBlockingCars(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
+                map2 = (grid2,map[1],map[2] + car + "a",DistanceToExitBlockingCars(grid2,coordinates(grid2)))  # Creates a copy of the current Map Tuple and Updates the current Solution
 
 
                 
@@ -356,7 +356,7 @@ def AStar(startState):
 
         if test_win(node[0]):
             solution = node
-            print("open nodes ->",len(visitedNodes))
+            #print("open nodes ->",len(visitedNodes))
             return solution[2]
 
 
@@ -393,5 +393,5 @@ if __name__ == "__main__":
             endTime = time.time()
     
     
-        #print("level nº " + str(j) + " time is " + str(endTime - startTime) + " seconds")
+        print("level nº " + str(j) + " time is " + str(endTime - startTime) + " seconds")
         j+=1
