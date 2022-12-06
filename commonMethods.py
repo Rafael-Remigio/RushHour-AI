@@ -146,14 +146,15 @@ def move(grid,piece,piece_coords,vector):
 
 
 
-def test_win(grid):
+def test_win(grid,carAy):
     """Test if player_car has crossed the left most column."""
 
     grid_size = len(grid)
     
-    return any(
-        [c[0] == grid_size - 1 for c in piece_coordinates("A",coordinates(grid))]
-    )
+    return "A" == grid[carAy][grid_size-1]
+    #any(
+    #    [c[0] == grid_size - 1 for c in piece_coordinates("A",coordinates(grid))]
+    #)
 
 
 
@@ -234,19 +235,34 @@ def DistanceToExitEuristics(grid,_coordinates):
 
 
 
-def DistanceToExitBlockingCars(grid,_coordinates):
+def coordinatesCar(grid):
+    """Cordinates of Main Car"""
+    _coordinates = []
+    
+    for y, line in enumerate(grid):
+        for x, column in enumerate(line):
+            if column == "A":
+                _coordinates.append((x, y, column))
+
+    return _coordinates
+
+
+
+def DistanceToExitBlockingCars(grid):
 
     grid_size = len(grid)
 
-    cords = piece_coordinates("A",_coordinates)[1]
+    cords = coordinatesCar(grid=grid)[1]
 
-
-    array = [(x,cords[1]) for x in range(grid_size-1,cords[0],-1)]
     counter = 0
-    for i in _coordinates:
-        if (i[0],i[1]) in array:
-            counter+=1
-        
+    for i in range(grid_size-1,cords[0],-1):
+        if grid[cords[1]][i] != "o":
+            counter += 1
+
+    #print("counter ->",counter)
+
+    #for i in grid:
+    #    print(i)
 
     return grid_size - cords[0] + counter
 
@@ -268,7 +284,7 @@ def possibleMovesAStart(map):
                 grid2 = copy.deepcopy(map[0])
                 move(grid2,car,carCords,(-1,0))
 
-                map2 = (grid2,map[1],map[2] + car + "a",DistanceToExitBlockingCars(grid2,coordinates(grid2)))  # Creates a copy of the current Map Tuple and Updates the current Solution
+                map2 = (grid2,map[1],map[2] + car + "a",DistanceToExitBlockingCars(grid2))  # Creates a copy of the current Map Tuple and Updates the current Solution
 
 
                 
@@ -282,7 +298,7 @@ def possibleMovesAStart(map):
                 grid2 = copy.deepcopy(map[0])
                 move(grid2,car,carCords,(1,0))
 
-                map2 = (grid2,map[1],map[2] + car + "d",DistanceToExitBlockingCars(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
+                map2 = (grid2,map[1],map[2] + car + "d",DistanceToExitBlockingCars(grid2))  # Creates a copy of the current Map Tuple and Updates the current Solution
 
                 
                 possibleStates.append(map2) # Appends it to the possible states
@@ -296,7 +312,7 @@ def possibleMovesAStart(map):
                 move(grid2,car,carCords,(0,-1))
 
 
-                map2 = (grid2,map[1],map[2] + car + "w",DistanceToExitBlockingCars(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
+                map2 = (grid2,map[1],map[2] + car + "w",DistanceToExitBlockingCars(grid2))  # Creates a copy of the current Map Tuple and Updates the current Solution
 
                 
                 possibleStates.append(map2) # Appends it to the possible states
@@ -308,7 +324,7 @@ def possibleMovesAStart(map):
                 grid2 = copy.deepcopy(map[0])
                 move(grid2,car,carCords,(0,1))
 
-                map2 = (grid2,map[1],map[2] + car + "s",DistanceToExitBlockingCars(grid2,_coordinates))  # Creates a copy of the current Map Tuple and Updates the current Solution
+                map2 = (grid2,map[1],map[2] + car + "s",DistanceToExitBlockingCars(grid2))  # Creates a copy of the current Map Tuple and Updates the current Solution
 
                 
                 possibleStates.append(map2) # Appends it to the possible states
@@ -321,13 +337,14 @@ def possibleMovesAStart(map):
 
 def breathsearch(startState):
     mapa = stringToGrid(startState)
+    carAy = piece_coordinates("A",coordinates(mapa[0]))[1][1]
     open_nodes = [mapa]
     visitedNodes = set()
     while open_nodes != []:
 
         node = open_nodes.pop(0)
 
-        if test_win(node[0]):
+        if test_win(node[0],carAy):
             solution = node
             print("open nodes ->",len(visitedNodes))
             return solution[2]
@@ -346,15 +363,14 @@ def breathsearch(startState):
 
 def AStar(startState):
     mapa = stringToGridA(startState) # returns a tuple with a cost starting at 0
+    carAy = piece_coordinates("A",coordinates(mapa[0]))[1][1]
     open_nodes = MyHeap([mapa],key=lambda x: x[3]) # Uses  a heap to keep the nodes sorted
     visitedNodes = set()
 
-
     while open_nodes != []:
-
         node = open_nodes.pop()
 
-        if test_win(node[0]):
+        if test_win(node[0],carAy):
             solution = node
             #print("open nodes ->",len(visitedNodes))
             return solution[2]

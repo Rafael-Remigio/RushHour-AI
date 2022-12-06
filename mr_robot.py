@@ -1,4 +1,3 @@
-"""Example client."""
 import asyncio
 import copy
 import getpass
@@ -28,8 +27,7 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
         level = 0
         moves = ''
         mapa = None
-        here = 0
-        crazyMode = False
+        counter = 0
         while True:
             try:
                 state = json.loads(
@@ -43,6 +41,7 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
                     currentlySearching = False
                     mapa = Map(state.get("grid"))
                     mapaString = state.get("grid").split(" ")[1]
+                    counter = 0
 
 
 
@@ -52,18 +51,25 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
                 
                 if mapaString != state.get("grid").split(" ")[1]:
                     newMapa = Map(state.get("grid"))
+                    if counter == 30:
+
+                        currentlySearching = True
+                        moves =  AStar(state.get("grid"))
+                        counter = 0
+
                     try: # if something goes wrong calculating the crazy cars
                         crazyMoves = calculateCrazyMoves(newMapa,mapa)
                         mapa = Map(state.get("grid"))
                         moves = crazyMoves + moves
+                        counter +=1
                     except: # recalculates a solution
                         currentlySearching = True
                         moves =  AStar(state.get("grid"))
 
 
-
-                if moves == "":
-                    continue
+            
+                #if moves == "":
+                #    continue
                 
 
 
