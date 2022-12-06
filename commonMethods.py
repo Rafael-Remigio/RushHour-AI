@@ -152,9 +152,6 @@ def test_win(grid,carAy):
     grid_size = len(grid)
     
     return "A" == grid[carAy][grid_size-1]
-    #any(
-    #    [c[0] == grid_size - 1 for c in piece_coordinates("A",coordinates(grid))]
-    #)
 
 
 
@@ -171,7 +168,8 @@ def possibleMoves(map):
 
             if canMove(map[0],car,(-1,0),carCords):
 
-                grid2 = copy.deepcopy(map[0])
+                grid2 = [row[:] for row in map[0]]
+
                 move(grid2,car,carCords,(-1,0))
 
                 map2 = (grid2,map[1],map[2] + car + "a")  # Creates a copy of the current Map Tuple and Updates the current Solution
@@ -185,7 +183,7 @@ def possibleMoves(map):
 
 
 
-                grid2 = copy.deepcopy(map[0])
+                grid2 = [row[:] for row in map[0]]
                 move(grid2,car,carCords,(1,0))
 
                 map2 = (grid2,map[1],map[2] + car + "d")  # Creates a copy of the current Map Tuple and Updates the current Solution
@@ -198,7 +196,7 @@ def possibleMoves(map):
             if canMove(map[0],car,(0,-1),carCords):
 
 
-                grid2 = copy.deepcopy(map[0])
+                grid2 = [row[:] for row in map[0]]
                 move(grid2,car,carCords,(0,-1))
 
 
@@ -211,7 +209,7 @@ def possibleMoves(map):
             if canMove(map[0],car,(0,1),carCords):
 
 
-                grid2 = copy.deepcopy(map[0])
+                grid2 = [row[:] for row in map[0]]
                 move(grid2,car,carCords,(0,1))
 
                 map2 = (grid2,map[1],map[2] + car + "s")  # Creates a copy of the current Map Tuple and Updates the current Solution
@@ -281,7 +279,7 @@ def possibleMovesAStart(map):
 
             if canMove(map[0],car,(-1,0),carCords):
 
-                grid2 = copy.deepcopy(map[0])
+                grid2 = [row[:] for row in map[0]]
                 move(grid2,car,carCords,(-1,0))
 
                 map2 = (grid2,map[1],map[2] + car + "a",DistanceToExitBlockingCars(grid2))  # Creates a copy of the current Map Tuple and Updates the current Solution
@@ -295,7 +293,7 @@ def possibleMovesAStart(map):
 
 
 
-                grid2 = copy.deepcopy(map[0])
+                grid2 = [row[:] for row in map[0]]
                 move(grid2,car,carCords,(1,0))
 
                 map2 = (grid2,map[1],map[2] + car + "d",DistanceToExitBlockingCars(grid2))  # Creates a copy of the current Map Tuple and Updates the current Solution
@@ -308,7 +306,7 @@ def possibleMovesAStart(map):
             if canMove(map[0],car,(0,-1),carCords):
 
 
-                grid2 = copy.deepcopy(map[0])
+                grid2 = [row[:] for row in map[0]]
                 move(grid2,car,carCords,(0,-1))
 
 
@@ -321,7 +319,7 @@ def possibleMovesAStart(map):
             if canMove(map[0],car,(0,1),carCords):
 
 
-                grid2 = copy.deepcopy(map[0])
+                grid2 = [row[:] for row in map[0]]
                 move(grid2,car,carCords,(0,1))
 
                 map2 = (grid2,map[1],map[2] + car + "s",DistanceToExitBlockingCars(grid2))  # Creates a copy of the current Map Tuple and Updates the current Solution
@@ -346,7 +344,7 @@ def breathsearch(startState):
 
         if test_win(node[0],carAy):
             solution = node
-            print("open nodes ->",len(visitedNodes))
+            #print("open nodes ->",len(visitedNodes))
             return solution[2]
 
 
@@ -372,7 +370,7 @@ def AStar(startState):
 
         if test_win(node[0],carAy):
             solution = node
-            #print("open nodes ->",len(visitedNodes))
+            print("open nodes ->",len(visitedNodes))
             return solution[2]
 
 
