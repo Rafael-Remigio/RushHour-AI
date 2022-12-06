@@ -4,7 +4,6 @@ import math
 import time
 
 
-
 import heapq
 
 class MyHeap(object):
@@ -368,14 +367,15 @@ def AStar(startState):
 
         if test_win(node[0],carAy):
             solution = node
-            print("open nodes ->",len(visitedNodes))
+            #print("open nodes ->",len(visitedNodes))
             return solution[2]
 
 
         for a in possibleMovesAStart(node):
-            if not visitedNodes.__contains__(str(a[0])):
+            stra = str(a[0])
+            if not visitedNodes.__contains__(stra):
                 open_nodes.push(a) # Pushes on to the heap. keeps the nodes sorted
-                visitedNodes.add(str(a[0]))
+                visitedNodes.add(stra)
 
 
 
@@ -392,6 +392,7 @@ if __name__ == "__main__":
     startTime = 0
     endTime = 0
     searchType = "A*"
+    totalTime = 0
     for i in Lines:
 
         if searchType == "breathSearch":
@@ -406,4 +407,6 @@ if __name__ == "__main__":
     
     
         print("level nº " + str(j) + " time is " + str(endTime - startTime) + " seconds")
+        totalTime += endTime - startTime
         j+=1
+    print("Tempo total =",totalTime)
