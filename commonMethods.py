@@ -219,11 +219,12 @@ def possibleMoves(map):
     return possibleStates
 
 
-def DistanceToExitEuristics(grid,_coordinates):
+def DistanceToExitEuristics(grid):
 
     grid_size = len(grid)
 
-    cords = piece_coordinates("A",_coordinates)[1]
+    cords = coordinatesCar(grid=grid)[1]
+
 
 
     return grid_size - cords[0]

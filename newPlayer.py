@@ -1,17 +1,17 @@
+"""Example client."""
 import asyncio
 import copy
 import getpass
 import imp
 from importlib.resources import path
 import json
-import math
 from mimetypes import common_types
 import os
 from re import search
 import time
 from tracemalloc import start
 from my_common import Coordinates, Map
-from commonMethods import breathsearch, AStar
+# Next 4 lines are not needed for AI agents, please remove them from your code!
 import pygame
 import websockets
 
@@ -27,49 +27,61 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
         level = 0
         moves = ''
         mapa = None
-        counter = 0
+        here = 0
+        crazyMode = False
         while True:
             try:
                 state = json.loads(
                     await websocket.recv()
                 )  # receive game update, this must be called timely or your game will get out of sync with the server
-                
-
+                print(state)
                 if state.get('level') != level:
                     level = state.get('level')
                     moves = ''
                     currentlySearching = False
                     mapa = Map(state.get("grid"))
                     mapaString = state.get("grid").split(" ")[1]
-                    counter = 0
-
-
+                    print(mapaString)
 
                 if not currentlySearching:
                     currentlySearching = True
-                    moves =  AStar(state.get("grid"))
+                    moves =  breathsearch(state.get("grid"))
+                    print(moves)
                 
                 if mapaString != state.get("grid").split(" ")[1]:
-                    newMapa = Map(state.get("grid"))
-                    if counter == 30:
+                    print("CrazyDriver", state.get("grid").split(" ")[1])
+                    crazyMode = True
 
-                        currentlySearching = True
-                        moves =  AStar(state.get("grid"))
-                        counter = 0
+                    crazyMoves = calculateCrazyMoves(mapaString,state.get("grid").split(" ")[1],mapa)
+                    mapa = Map(state.get("grid"))
 
-                    try: # if something goes wrong calculating the crazy cars
-                        crazyMoves = calculateCrazyMoves(newMapa,mapa)
-                        mapa = Map(state.get("grid"))
-                        moves = crazyMoves + moves
-                        counter +=1
-                    except: # recalculates a solution
-                        currentlySearching = True
-                        moves =  AStar(state.get("grid"))
+                if crazyMode:
+                    here += 1
+                    if crazyMoves == "":
+                        crazyMode = False
+                        here = 0
+                        continue
+                    
+                    if here == 60:
+                        currentlySearching = False
+                        level = 0
+                        moves = ''
+                        crazyMoves = ''
+                        mapa = None
+                        here = 0
+                        crazyMode = False
+                        continue
+
+                    mapaString, crazyMoves, key = getNextMove(crazyMoves,state.get("cursor"),mapa,state.get("selected"),mapaString)
+                    await websocket.send(json.dumps({"cmd": "key", "key": key})) 
 
 
-            
-                #if moves == "":
-                #    continue
+
+                    continue
+
+
+                if moves == "":
+                    continue
                 
 
 
@@ -85,62 +97,36 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
                 return
 
 
-def calculateCrazyMoves(newMap,oldMapa):
-    crazy_moves = ""
-    grid_str = oldMapa.__repr__().split(" ")[1]
-    new_grid_str = newMap.__repr__().split(" ")[1]
+def calculateCrazyMoves(oldMap,newMap,m):
 
-    
+    grid_str = oldMap
+    crazy_car = None
+    positive = 0
+    for i in range(len(oldMap)):
+        old_char = grid_str[i]
+        new_char = newMap[i]
+        # Gets the odd character
+        if new_char != old_char:
+            crazy_car = old_char if old_char != 'o' else new_char
+            positive = -1 if old_char != 'o' else 1
 
+    print(crazy_car,positive)    
 
-    while (grid_str != new_grid_str):
-        crazy_car = None
-        positive = 0
-
-
-        for i in range(len(grid_str)):
-            old_char = grid_str[i]
-            new_char = new_grid_str[i]
-            # Gets the odd character
-            if new_char != old_char:
-                crazy_car = old_char if old_char != 'o' else new_char
-                positive = -1 if old_char != 'o' else 1
-                break
-            
-
-        if oldMapa.piece_coordinates(crazy_car)[0].y == oldMapa.piece_coordinates(crazy_car)[1].y:
-            print("horizontal")
-            if positive == -1:
-                crazy_moves = crazy_moves + crazy_car+"a"
-                print(crazy_car,letterToCoords("a"))
-                newMap.move(crazy_car,letterToCoords("a")) #moves car in the map Object
-                
-            else:
-                crazy_moves = crazy_moves + crazy_car+"d"
-                print(crazy_car,letterToCoords("d"))
-                newMap.move(crazy_car,letterToCoords("d")) #moves car in the map Object
-
-
+    if m.piece_coordinates(crazy_car)[0].y == m.piece_coordinates(crazy_car)[1].y:
+        print("horizontal")
+        if positive == -1:
+            return crazy_car+"d"
         else:
+            return crazy_car+"a"
 
-            if positive == -1:
-                crazy_moves = crazy_moves + crazy_car+"w"
-                crazy_car,letterToCoords("w")
-                newMap.move(crazy_car,letterToCoords("w")) #moves car in the map Object
-            else:
-                crazy_moves = crazy_moves + crazy_car+"s"
-                crazy_car,letterToCoords("s")
-                newMap.move(crazy_car,letterToCoords("s")) #moves car in the map Object
+    else:
+        print("vertical")
 
+        if positive == -1:
+            return crazy_car+"s"
+        else:
+            return crazy_car+"w"
 
-
-        grid_str = oldMapa.__repr__().split(" ")[1]
-        new_grid_str = newMap.__repr__().split(" ")[1]
-
-
-
-
-    return crazy_moves
 
 def getNextMove(moves,cursor,mapa,selected,mapaString):
     
@@ -213,6 +199,31 @@ def moveCursorToCar(carCordinates,cursor):
         return "w"
     
 
+def breathsearch(startState):
+    open_nodes = [startState]
+    visitedNodes = set()
+    paths = {startState: ""}
+    while open_nodes != []:
+        node = open_nodes.pop(0)
+        mapa = Map(node)
+
+
+        if mapa.test_win():
+            solution = node
+            return paths.get(solution)
+
+
+        for a in possibleMoves(mapa):
+            if not visitedNodes.__contains__(a[0]):
+                open_nodes.append(a[0])
+                visitedNodes.add(a[0])
+                paths[a[0]] = paths.get(node) + a[1]
+
+
+        #print(len(visitedNodes),len(open_nodes))
+
+    return None
+
 # This code need to be rebuilt
 def possibleMoves(m):
     possibleStates = []
@@ -247,13 +258,19 @@ def possibleMoves(m):
 
 
     return possibleStates
-  
 
+""" 
+file1 = open('levels.txt', 'r')
+Lines = file1.readlines()
+j =1
+for i in Lines:
 
-
-
-
-
+    startTime = time.time()
+    print(breathsearch(i))
+    endTime = time.time()
+    print("lever nº " + str(j) + " time is " + str(endTime - startTime) + " seconds")
+    j+=1
+ """
 
 # DO NOT CHANGE THE LINES BELLOW
 # You can change the default values using the command line, example:
@@ -264,4 +281,3 @@ SERVER = os.environ.get("SERVER", "localhost")
 PORT = os.environ.get("PORT", "8000")
 NAME = os.environ.get("NAME", getpass.getuser())
 loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME)) 
-
