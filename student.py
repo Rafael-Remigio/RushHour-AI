@@ -23,11 +23,16 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
 
         # Receive information about static game properties
         await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
+
+
         currentlySearching = False
         level = 0
         moves = ''
         mapa = None
         counter = 0
+        
+        
+        
         while True:
             try:
                 state = json.loads(
@@ -44,11 +49,11 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
                     counter = 0
 
 
-
                 if not currentlySearching:
                     currentlySearching = True
                     moves =  AStar(state.get("grid"))
-                
+
+
                 if mapaString != state.get("grid").split(" ")[1]:
                     newMapa = Map(state.get("grid"))
                     if counter == 30:
@@ -57,14 +62,32 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
                         moves =  AStar(state.get("grid"))
                         counter = 0
 
-                    try: # if something goes wrong calculating the crazy cars
-                        crazyMoves = calculateCrazyMoves(newMapa,mapa)
-                        mapa = Map(state.get("grid"))
-                        moves = crazyMoves + moves
+                    # Only send the crazy cars backwards if it is faster than calculating a new solution
+                    # For this is i use the ammount of possible states
+                    if int(state.get("grid").split(" ")[2]) > 2000:
+
+                        try: # I use a try only if something goes wrong calculating the crazy cars
+                            crazyMoves = calculateCrazyMoves(newMapa,mapa)
+                            mapa = Map(state.get("grid"))
+                            moves = crazyMoves + moves
+                            mapaString = state.get("grid").split(" ")[1]
+                            counter +=1
+                        except: # recalculates a solution
+                            currentlySearching = True
+                            print("recalculates from crazyMoves currentlySearching")
+                            moves =  AStar(state.get("grid"))
+                            mapaString = state.get("grid").split(" ")[1]
+                            mapa = Map(state.get("grid"))
+                    else:
                         counter +=1
-                    except: # recalculates a solution
                         currentlySearching = True
+                        print("recalculates from crazyMoves currentlySearching",counter)
                         moves =  AStar(state.get("grid"))
+                        mapaString = state.get("grid").split(" ")[1]
+                        mapa = Map(state.get("grid"))
+
+
+
 
 
             
@@ -76,7 +99,15 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
                     
                     
                 # do the move
-                mapaString, moves, key = getNextMove(moves,state.get("cursor"),mapa,state.get("selected"),mapaString)
+                try:
+                    mapaString, moves, key = getNextMove(moves,state.get("cursor"),mapa,state.get("selected"),mapaString)
+
+                except: # recalculates a solution
+                    currentlySearching = True
+                    moves =  AStar(state.get("grid"))
+                    mapaString = state.get("grid")
+                    mapa = Map(state.get("grid"))
+                    continue
 
                 await websocket.send(json.dumps({"cmd": "key", "key": key})) 
 
@@ -91,7 +122,7 @@ def calculateCrazyMoves(newMap,oldMapa):
     new_grid_str = newMap.__repr__().split(" ")[1]
 
     
-
+    print("crazies ---------------------------------")
 
     while (grid_str != new_grid_str):
         crazy_car = None
@@ -125,11 +156,11 @@ def calculateCrazyMoves(newMap,oldMapa):
 
             if positive == -1:
                 crazy_moves = crazy_moves + crazy_car+"w"
-                crazy_car,letterToCoords("w")
+                print(crazy_car,letterToCoords("w"))
                 newMap.move(crazy_car,letterToCoords("w")) #moves car in the map Object
             else:
                 crazy_moves = crazy_moves + crazy_car+"s"
-                crazy_car,letterToCoords("s")
+                print(crazy_car,letterToCoords("s"))
                 newMap.move(crazy_car,letterToCoords("s")) #moves car in the map Object
 
 
@@ -154,7 +185,7 @@ def getNextMove(moves,cursor,mapa,selected,mapaString):
 
             key = moves[1] #selects the move
 
-            mapa.moveWithNoTests(moves[0],letterToCoords(moves[1])) #moves car in the map Object
+            mapa.move(moves[0],letterToCoords(moves[1])) #moves car in the map Object
 
             moves =  moves[2:]  #removes the move from the grid
             
@@ -163,6 +194,8 @@ def getNextMove(moves,cursor,mapa,selected,mapaString):
             # This will only change the MapaString variable
             # using the Map.__repr_ method takes O(n)
             # maybe there is a better solution, Problem for future me
+
+            #Future me here, im not doing any of this, its python, who care about time complexities
 
             mapaString = mapa.__repr__().split(" ")[1]
 
