@@ -1,38 +1,47 @@
-# ia-tetris
-Projecto de Inteligência Artificial 2022 - Rush Hour
+# RUSH HOUR
+Artificial Intelligence Project 2022 - Rush Hour
 
-## How to install
+## Rules of the Game
+[Explaination of the Rush Hour Puzzle Game](https://en.wikipedia.org/wiki/Rush_Hour_(puzzle)). Not only were there the basic rules of the Rush Hour Puzzle Game, but at certain intervals a random Car can move itself. Theese are described as Crazy Drivers. These serve to add complexity to the original puzzle.
 
-Make sure you are running Python 3.7 or higher
+## Algorithm Used
 
-`$ pip install -r requirements.txt`
+The algorithms used were [BreathSearch](https://en.wikipedia.org/wiki/Breadth-first_search), a [BestFirstSearch](https://en.wikipedia.org/wiki/Best-first_search) and the heuristics used for the BestFirstSearch were:
+*  H1 -> Distance from Red Car to exit/Goal
+*  H1 -> Distance from Red Car to exit/Goal + the Number of cars in its way
 
-*Tip: you might want to create a virtualenv first*
 
-## How to play
+## Results
 
-open 3 terminals:
+<img src="report/pointHeuristics.png">
+<img src="report/VisitedNodesComparision.png">
+<img src="report/timeChanges.png">
+<img src="report/H1andH2.png">
 
-`$ python3 server.py`
 
-`$ python3 viewer.py`
+<img src="report/PlayingGif.gif">
 
-`$ python3 client.py`
 
-to play using the sample client make sure the client pygame window has focus
 
-### Keys
 
-Directions: arrows
 
-## Debug Installation
 
-Make sure pygame is properly installed:
 
-python -m pygame.examples.aliens
 
-# Tested on:
-- OSX Monterey 12.5.1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -53,7 +53,7 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
                     currentlySearching = True
                     moves =  AStar(state.get("grid"))
 
-                
+
                 if mapaString != state.get("grid").split(" ")[1]:
                     newMapa = Map(state.get("grid"))
                     if counter == 30:
@@ -62,18 +62,31 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
                         moves =  AStar(state.get("grid"))
                         counter = 0
 
-                    try: # if something goes wrong calculating the crazy cars
-                        crazyMoves = calculateCrazyMoves(newMapa,mapa)
-                        mapa = Map(state.get("grid"))
-                        moves = crazyMoves + moves
-                        mapaString = state.get("grid").split(" ")[1]
+                    # Only send the crazy cars backwards if it is faster than calculating a new solution
+                    # For this is i use the ammount of possible states
+                    if int(state.get("grid").split(" ")[2]) > 2000:
+
+                        try: # I use a try only if something goes wrong calculating the crazy cars
+                            crazyMoves = calculateCrazyMoves(newMapa,mapa)
+                            mapa = Map(state.get("grid"))
+                            moves = crazyMoves + moves
+                            mapaString = state.get("grid").split(" ")[1]
+                            counter +=1
+                        except: # recalculates a solution
+                            currentlySearching = True
+                            print("recalculates from crazyMoves currentlySearching")
+                            moves =  AStar(state.get("grid"))
+                            mapaString = state.get("grid").split(" ")[1]
+                            mapa = Map(state.get("grid"))
+                    else:
                         counter +=1
-                    except: # recalculates a solution
                         currentlySearching = True
-                        print("recalculates from crazyMoves currentlySearching")
+                        print("recalculates from crazyMoves currentlySearching",counter)
                         moves =  AStar(state.get("grid"))
-                        mapaString = state.get("grid")
+                        mapaString = state.get("grid").split(" ")[1]
                         mapa = Map(state.get("grid"))
+
+
 
 
 

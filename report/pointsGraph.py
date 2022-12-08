@@ -21,5 +21,5 @@ plt.bar(courses[3], values[3], color ='blue')
  
 plt.xlabel("Different Heuristics and Code")
 plt.ylabel("Average Number of Points obtained")
-plt.title("Pontuactions Comparision")
+plt.title("Game Scores Comparision")
 plt.show()
