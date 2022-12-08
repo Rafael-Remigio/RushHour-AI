@@ -398,14 +398,14 @@ if __name__ == "__main__":
 
         if searchType == "breathSearch":
             startTime = time.time()
-            breathsearch(i)
+            print(breathsearch(i))
             endTime = time.time()
 
         if searchType == "A*":
             startTime = time.time()
-            AStar(i)
+            print(AStar(i))
             endTime = time.time()
-    
+
     
         print("level nº " + str(j) + " time is " + str(endTime - startTime) + " seconds")
         totalTime += endTime - startTime

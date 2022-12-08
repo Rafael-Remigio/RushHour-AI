@@ -23,11 +23,16 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
 
         # Receive information about static game properties
         await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
+
+
         currentlySearching = False
         level = 0
         moves = ''
         mapa = None
         counter = 0
+        
+        
+        
         while True:
             try:
                 state = json.loads(
@@ -47,11 +52,7 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
                 if not currentlySearching:
                     currentlySearching = True
                     moves =  AStar(state.get("grid"))
-                    currentlySearching = False
 
-                
-                if currentlySearching:
-                    continue
                 
                 if mapaString != state.get("grid").split(" ")[1]:
                     newMapa = Map(state.get("grid"))
@@ -59,7 +60,6 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
 
                         currentlySearching = True
                         moves =  AStar(state.get("grid"))
-                        currentlySearching = False
                         counter = 0
 
                     try: # if something goes wrong calculating the crazy cars
@@ -70,9 +70,10 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
                         counter +=1
                     except: # recalculates a solution
                         currentlySearching = True
-                        print("currentlySearching")
+                        print("recalculates from crazyMoves currentlySearching")
                         moves =  AStar(state.get("grid"))
-                        currentlySearching = False
+                        mapaString = state.get("grid")
+                        mapa = Map(state.get("grid"))
 
 
 
@@ -91,7 +92,8 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
                 except: # recalculates a solution
                     currentlySearching = True
                     moves =  AStar(state.get("grid"))
-                    currentlySearching = False
+                    mapaString = state.get("grid")
+                    mapa = Map(state.get("grid"))
                     continue
 
                 await websocket.send(json.dumps({"cmd": "key", "key": key})) 
