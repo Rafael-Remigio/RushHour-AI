@@ -74,14 +74,12 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
                             counter +=1
                         except: # recalculates a solution
                             currentlySearching = True
-                            print("recalculates from crazyMoves currentlySearching")
                             moves =  AStar(state.get("grid"))
                             mapaString = state.get("grid").split(" ")[1]
                             mapa = Map(state.get("grid"))
                     else:
                         counter +=1
                         currentlySearching = True
-                        print("recalculates from crazyMoves currentlySearching",counter)
                         moves =  AStar(state.get("grid"))
                         mapaString = state.get("grid").split(" ")[1]
                         mapa = Map(state.get("grid"))
@@ -108,7 +106,6 @@ async def agent_loop(server_address="localhost:8080", agent_name="mr_Robot"):
                     mapaString = state.get("grid")
                     mapa = Map(state.get("grid"))
                     continue
-
                 await websocket.send(json.dumps({"cmd": "key", "key": key})) 
 
             except websockets.exceptions.ConnectionClosedOK:
@@ -122,7 +119,6 @@ def calculateCrazyMoves(newMap,oldMapa):
     new_grid_str = newMap.__repr__().split(" ")[1]
 
     
-    print("crazies ---------------------------------")
 
     while (grid_str != new_grid_str):
         crazy_car = None
@@ -140,15 +136,12 @@ def calculateCrazyMoves(newMap,oldMapa):
             
 
         if oldMapa.piece_coordinates(crazy_car)[0].y == oldMapa.piece_coordinates(crazy_car)[1].y:
-            print("horizontal")
             if positive == -1:
                 crazy_moves = crazy_moves + crazy_car+"a"
-                print(crazy_car,letterToCoords("a"))
                 newMap.move(crazy_car,letterToCoords("a")) #moves car in the map Object
                 
             else:
                 crazy_moves = crazy_moves + crazy_car+"d"
-                print(crazy_car,letterToCoords("d"))
                 newMap.move(crazy_car,letterToCoords("d")) #moves car in the map Object
 
 
@@ -156,11 +149,9 @@ def calculateCrazyMoves(newMap,oldMapa):
 
             if positive == -1:
                 crazy_moves = crazy_moves + crazy_car+"w"
-                print(crazy_car,letterToCoords("w"))
                 newMap.move(crazy_car,letterToCoords("w")) #moves car in the map Object
             else:
                 crazy_moves = crazy_moves + crazy_car+"s"
-                print(crazy_car,letterToCoords("s"))
                 newMap.move(crazy_car,letterToCoords("s")) #moves car in the map Object
 
 
@@ -196,7 +187,6 @@ def getNextMove(moves,cursor,mapa,selected,mapaString):
             # maybe there is a better solution, Problem for future me
 
             #Future me here, im not doing any of this, its python, who care about time complexities
-
             mapaString = mapa.__repr__().split(" ")[1]
 
 
@@ -213,8 +203,21 @@ def getNextMove(moves,cursor,mapa,selected,mapaString):
     
     # if not on top of the car we need to move to the top of the car
     else:   
-        return mapaString, moves, moveCursorToCar(mapa.piece_coordinates(moves[0])[0],cursor)
+        bestPos = bestPoint(cursorPos,mapa.piece_coordinates(moves[0]))
+        return mapaString, moves, moveCursorToCar(bestPos,cursorPos)
 
+
+def bestPoint(cursorPos, desiredPos):
+        bestPos = Coordinates(desiredPos[0].x, desiredPos[0].y)
+        distance = (cursorPos.x - desiredPos[0].x) ** 2 + (cursorPos.y - desiredPos[0].y) ** 2
+        # Distance between entre o cursor e o carro
+        for position in desiredPos:
+            distance1 = (cursorPos.x - position.x) ** 2 + (cursorPos.y - position.y) ** 2
+            if distance1 < distance:
+                distance = distance1
+                bestPos = Coordinates(position.x, position.y)
+
+        return bestPos
 
 
 def letterToCoords(letter):
@@ -234,16 +237,18 @@ def letterToCoords(letter):
     
     return None
 
-def moveCursorToCar(carCordinates,cursor):
+def moveCursorToCar(carCordinates,cursorPos):
 
-    if carCordinates.x > cursor[0]:
+
+    if carCordinates.x > cursorPos.x:
         return "d"
-    elif carCordinates.x < cursor[0]:
+    elif carCordinates.x < cursorPos.x:
         return "a"
-    elif carCordinates.y > cursor[1]:
+    elif carCordinates.y > cursorPos.y:
         return "s"
-    elif carCordinates.y < cursor[1]:
+    elif carCordinates.y < cursorPos.y:
         return "w"
+
     
 
 # This code need to be rebuilt

@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
  
   
 # creating the dataset
-data = {'First delivery':174154.6, 'Code optimizations':486126, 'H1':1554563,
-        'H2':1555240}
+data = {'First delivery':174154.6, 'Code optimizations':486126, 'H1':1555302,
+        'H2':1555302}
 courses = list(data.keys())
 values = list(data.values())
   
