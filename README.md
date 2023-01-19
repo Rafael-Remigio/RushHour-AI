@@ -1,3 +1,6 @@
+Graded 19.5 out of 20
+
+
 # RUSH HOUR
 Artificial Intelligence Project 2022 - Rush Hour
 
